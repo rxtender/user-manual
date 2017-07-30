@@ -1,0 +1,9 @@
+site_name: RXTender User Manual
+pages:
+    - Introduction: index.md
+    - Rationale: rationale.md
+    - Communication Patterns: com_pattern.md
+    - Language: language.md
+    - Backends: backends.md
+    - Backend Development: backend_dev.md
+theme: readthedocs
