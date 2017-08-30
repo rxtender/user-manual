@@ -9,6 +9,8 @@
 ## Adding Comments
 
         //
+        /* */
+        
 
 ## Scalar Types
 
@@ -36,14 +38,6 @@ A stream can have the same name than a message
 
 Any message that
 
-## Importing Definitions
-
-    import foo.bar.status
-
-imports definitions in "foo/bar/status.rxt"
-
 ## Naming convention
 
-items and streams are CamelCase. These names may be changed to lowercase when
-this allows more consistent naming in the target language. See the documentation
-of each backend for more information. 
+items and streams are CamelCase.

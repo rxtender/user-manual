@@ -1,9 +1,10 @@
-site_name: RXTender User Manual
+site_name: RxTender User Manual
 pages:
     - Introduction: index.md
     - Rationale: rationale.md
+    - Get Started: get_started.md
     - Communication Patterns: com_pattern.md
     - Language: language.md
-    - Backends: backends.md
+    - Base Backend: backend_base.md
     - Backend Development: backend_dev.md
 theme: readthedocs

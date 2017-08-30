@@ -27,16 +27,27 @@ All templates follow the same naming convention:
 selected language also needs other files types to be generated, then additional
 output type templates can be implemented. For example with C or C++ a header
 file is also needed. So these languages also implement "header" output types. So
-a backend with support for c contains "source.item.tpl" and "header.item.tpl"
+a backend with support for c contains "source.content.tpl" and "header.content.tpl"
 templates in the serialization modules.
+
+## Messages
+
+- stream creation request
+- stream creation ack
+- stream creation nack
+- stream deletion request
+- stream deletion ack
+- next item publish
+- stream complete
+- stream error
 
 ## Serialization
 
 - header.tpl
+- content.tpl
 - footer.tpl
-- item.tpl
-- message.tpl
 
-## Observable
 
-Observables follow the [Observable Contract](http://reactivex.io/documentation/contract.html)
+## Streams
+
+Streams generate Observables proxies that follow the [Observable Contract](http://reactivex.io/documentation/contract.html)
