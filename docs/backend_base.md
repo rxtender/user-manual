@@ -20,9 +20,13 @@ Creation message:
             "streamId": {
               "description": "Id of the stream to create",
               "type": "number"
+            },
+            "args": {
+              "description": "arguments used to create the stream",
+              "type": "array"
             }
         },
-        "required": ["what", "streamType"]
+        "required": ["what", "streamType", "streamId", "args"]
     }
 
 example:
