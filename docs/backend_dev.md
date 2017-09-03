@@ -19,12 +19,9 @@ The source layout of a backend is the following one:
 
     rtx_backend_foo
         /[language[_framework]]            
-            /transport
             /framing
             /serialization
-            /observable
-                /source
-                /sink
+            /stream
 
 where foo is the name of the backend, [language] is the name of a programming
 language. There is one [language] module per programming language supported by
@@ -54,7 +51,7 @@ templates in the serialization modules.
 - stream complete
 - stream error
 
-## Serialization
+## Templates
 
 - header.tpl
 - content.tpl

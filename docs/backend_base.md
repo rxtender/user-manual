@@ -120,7 +120,7 @@ example:
           }
     }
 
-Completed item message:
+Completed message:
 
     {
         "title": "Completed Message",
@@ -140,7 +140,7 @@ example:
         "what": "completed"
     }
 
-Error item message:
+Error message:
 
     {
         "title": "Error Message",

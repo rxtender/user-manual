@@ -44,8 +44,6 @@ A stream can have the same name than an item. A stream can accept arguments used
 
     stream State(foo: u32, bar: u32) -> Status;
 
-Any message that
-
 ## Naming convention
 
 items and streams are CamelCase.
