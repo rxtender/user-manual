@@ -2,8 +2,8 @@ The RxTender IDL syntax is heavily inspired from the
 [rust](https://www.rust-lang.org) language.
 
 !!! attention "unstable"
-    The syntax is not stable yet. Everything decoumented here can
-    change in the future. Moreover some features are not implemented yet.
+    The syntax is not stable yet. Everything documented here can
+    change in the future. Moreover, some features are not implemented yet.
 
 ## Defining an Item
 

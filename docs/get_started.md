@@ -1,7 +1,7 @@
 Let's consider the following situation: Your team develops a product that is
 composed of two services, using different programming languages (javascript and
 python). You use Reactive Streams in both components and you need to communicate
-between them. This is exaclty where RxTender can help you: Generate reactive
+between them. This is exactly where RxTender can help you: Generate reactive
 streams bindings between your services.
 
 Your user story is the following one:
@@ -38,7 +38,7 @@ stream. They are named "CounterItem" and contain a single field name "value".
 The type of this field is a signed 32bits integer (i32).
 
 Then there is the definition of the stream. It is named "Counter". It takes 3
-arguments as input : start, end, and step. This stream will emit items of type
+arguments as input: start, end, and step. This stream will emit items of type
 CounterItem.
 
 ## The python server
@@ -79,7 +79,7 @@ loop.close()
 
 Each time a client connects to the server, a new CounterServerProtocol object is
 created and its "connection_made" method is called. The first thing to do is
-importing the defnitions we will need:
+importing the definitions we will need:
 
 ```diff
 import asyncio
@@ -296,7 +296,7 @@ Then we create an Observable. The returned observable is an RxJS Observable. So
 we can use it as any other stream. Here we directly subscribe to it and print
 each received item.
 
-The last think to do is implementing the data reception callback:
+The last thing to do is implementing the data reception callback:
 
 ```javascript
 client.on('data', function(data) {
@@ -414,8 +414,8 @@ Javascript NPM package.json:
 
 You can see here that 2 stream arguments are provided to rxtender: es2015.stream
 and es2015_rxjs.stream. The first one generates generic es2015 stream bindings
-while the second ones directly implements functions to create RxJS
-Observables(The createCounterObservable function that we used to create the
+while the second one generates constructor functions for RxJS
+Observables (The createCounterObservable function that we used to create the
 stream). To generate the code, install npm dependencies and run rxtender:
 
 ```shell
@@ -436,7 +436,7 @@ and run the javascript client:
 npm start
 ```
 
-You shoud get the following output:
+You should get the following output:
 
 ```shell
 > counter-example@0.2.0 start /Users/bipbip/Documents/devel/rxtender/test
@@ -460,6 +460,6 @@ completed
 Yeah! With only few lines of codes you used reactive streams to communicate
 between two processes written in different programming languages. You can now
 add other streams in the rxt file. All these streams will be multiplexed in
-the same socket. Moreover if you want to change the serialization or framing
+the same socket. Moreover, if you want to change the serialization or framing
 protocol, then you do not need to change anything in your code: Just select
 other ones when invoking rxtender.
