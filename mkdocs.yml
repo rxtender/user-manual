@@ -8,3 +8,6 @@ pages:
     - Base Backend: backend_base.md
     - Backend Development: backend_dev.md
 theme: readthedocs
+
+markdown_extensions:
+    - admonition:
