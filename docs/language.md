@@ -1,3 +1,9 @@
+The RxTender IDL syntax is heavily inspired from the
+[rust](https://www.rust-lang.org) language.
+
+!!! attention "unstable"
+    The syntax is not stable yet. Everything decoumented here can
+    change in the future. Moreover some features are not implemented yet.
 
 ## Defining an Item
 
@@ -10,7 +16,7 @@
 
         //
         /* */
-        
+
 
 ## Scalar Types
 
@@ -34,7 +40,9 @@
 
     stream State() -> Status;
 
-A stream can have the same name than a message
+A stream can have the same name than an item. A stream can accept arguments used for its creation:
+
+    stream State(foo: u32, bar: u32) -> Status;
 
 Any message that
 
