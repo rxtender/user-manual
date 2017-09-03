@@ -1,3 +1,16 @@
+## Principles
+
+A RxTender backend is a python package that contains jinja2 templates. A backend
+can implement one, several, or all features of RxTender : Framing,
+serialization, and router. Each of these features is implemented as several
+template files. The following figure shows how code is generated:
+
+![workflow](diagram/workflow.png)
+
+RxTender takes an rxt definition file as input. It then generates chunks of code
+from each template file being used. Finally all chunks of code are combined to
+generate a final file.
+
 ## Backend Structure
 
 python package, jinja2 template engine for code generation.
@@ -5,7 +18,7 @@ python package, jinja2 template engine for code generation.
 The source layout of a backend is the following one:
 
     rtx_backend_foo
-        /[language[-framework]]            
+        /[language[_framework]]            
             /transport
             /framing
             /serialization
