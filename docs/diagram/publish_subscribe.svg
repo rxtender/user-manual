@@ -14,7 +14,10 @@
    id="svg3780"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="publish_subscribe.svg">
+   sodipodi:docname="publish_subscribe.svg"
+   inkscape:export-filename="/Users/bipbip/Documents/devel/rxtender/user-manual/docs/diagram/publish_subscribe.png"
+   inkscape:export-xdpi="111"
+   inkscape:export-ydpi="111">
   <defs
      id="defs3782">
     <marker
@@ -51,19 +54,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="294.09877"
-     inkscape:cy="962.10879"
+     inkscape:zoom="1.4"
+     inkscape:cx="252.77133"
+     inkscape:cy="978.70868"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:snap-bbox="true"
      inkscape:bbox-nodes="true"
-     inkscape:window-width="1280"
-     inkscape:window-height="751"
-     inkscape:window-x="0"
-     inkscape:window-y="1"
-     inkscape:window-maximized="1">
+     inkscape:window-width="1207"
+     inkscape:window-height="610"
+     inkscape:window-x="5"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid3788" />
@@ -85,7 +88,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:none;stroke:#2c3e50;stroke-width:1.78885436;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#2c3e50;stroke-width:1.789;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect3790"
        width="80"
        height="40"
@@ -110,7 +113,7 @@
        height="39.226036"
        width="80.226036"
        id="rect4323"
-       style="fill:none;stroke:#2c3e50;stroke-width:1.77396429;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+       style="fill:none;stroke:#2c3e50;stroke-width:1.774;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
     <text
        sodipodi:linespacing="125%"
        id="text4325"
@@ -163,27 +166,9 @@
        d="m 210,77.362183 a 5,5 0 1 1 -10,0 5,5 0 1 1 10,0 z"
        transform="translate(60,-25)" />
     <path
-       style="fill:none;stroke:#2c3e50;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4,1;stroke-dashoffset:0"
-       d="m 300,32.362183 c -39.08673,-12.329095 -79.00916,-13.376368 -120,0"
-       id="path5715"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
-    <path
        style="fill-rule:evenodd;stroke:#2c3e50;stroke-width:0.8pt;stroke-opacity:1"
        d="m 189.68995,29.17575 2.17001,-5.224085 -11.41262,9.041682 14.4667,-1.647589 -5.22409,-2.170008 z"
        id="path5717"
        inkscape:connector-curvature="0" />
-    <text
-       xml:space="preserve"
-       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Verdana;-inkscape-font-specification:Verdana"
-       x="210.71429"
-       y="20.576468"
-       id="text5719"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan5721"
-         x="210.71429"
-         y="20.576468"
-         style="font-size:8px">create observable</tspan></text>
   </g>
 </svg>
