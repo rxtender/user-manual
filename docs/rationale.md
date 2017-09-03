@@ -1,13 +1,17 @@
 
 RxTender is built on the following ideas:
 
-- An IDL is used to specify reactive stream.
+- An IDL is used to specify reactive streams.
 - There is a clear separation between:
-    - serialization
     - transport
-    - stream APIs
-- It is possible to generate source and sink streams (c.f. ).
-- Extensible to new programming languages, serialization and transport protocols.
+    - framing
+    - serialization    
+    - stream definition
+- It is possible to generate source and sink streams.
+- It is easy to add support for new programming languages, serialization and framing protocols.
+- The transport layer is not managed by RxTenders.
 
-RXtender allows only to generate code for stream source and sinks. However it
-is designed to be easily extensible to new programming languages and transports.
+These ideas are summarized on the following figure showing a typical usage of
+RxTender where two services communicate with a reactive stream:
+
+![RxTender principles](diagram/principles.png)
