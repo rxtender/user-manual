@@ -1,3 +1,7 @@
+This is the "not so short" getting started tutorial of RxTender. In this
+tutorial you will learn to use reactive streams to communicate between python
+and javascript code.
+
 Let's consider the following situation: Your team develops a product that is
 composed of two services, using different programming languages (javascript and
 python). You use Reactive Streams in both components and you need to communicate
@@ -20,26 +24,33 @@ You ended up with the following technical choices:
 
 ## Stream Definition
 
-The first thing to do is to write the stream specification. We want 3 arguments
-to create our counter: Its initial value, its end vale, and its increase step.
+The first thing to do is to write the stream specifications. We want 3 arguments
+to create our counter: Its initial value, its end value, and its increase step.
 The stream specification is written in an IDL whose syntax is heavily inspired
 from rust. Save the following code to a file named "counter.rxt":
 
 ```
-item CounterItem {
+struct CounterItem {
     value: i32;
 }
 
-stream Counter(start: i32, end: i32, step: i32) -> CounterItem;
+struct CounterError {
+    message :string;
+}
+
+stream Counter(start: i32, end: i32, step: i32) -> Stream<CounterItem, CounterError>;
 ```
 
 First there is the definition of the type of items that are emitted on the
-stream. They are named "CounterItem" and contain a single field name "value".
-The type of this field is a signed 32bits integer (i32).
+stream. They are named "CounterItem" and contain a single field named "value".
+The type of this field is a signed 32 bits integer (i32).
 
-Then there is the definition of the stream. It is named "Counter". It takes 3
-arguments as input: start, end, and step. This stream will emit items of type
-CounterItem.
+Then there is the definition of the error type associated to the stream. The
+COunterError struct contains a single string field named "message".
+
+Finally there is the definition of the stream. It is named "Counter". It takes 3
+creation arguments: start, end, and step. This stream will emit items of type
+CounterItem, and raise errors of type CounterError.
 
 ## The python server
 
@@ -235,129 +246,214 @@ loop.close()
 
 ## NodeJS client
 
-For the nodejs client, we start with a TCP client app:
+For the nodejs client, we start with a TCP client, implemented as a function
+that returns a stream of stream:
 
 ```javascript
-var net = require('net');
+import {Observable, Subject} from 'rxjs';
+import {Socket} from 'net';
+let connection = [];
 
-var HOST = '127.0.0.1';
-var PORT = 9999;
+function createConnection(id, host, port) {
+  const state$ = Observable.create(stateObserver => {
+    let dataObserver = null;
+    const data$ = Observable.create(observer => {
+      dataObserver = observer;
+    });
 
-var client = new net.Socket();
-client.connect(PORT, HOST, function() {
-    console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-});
+    connection[id] = new Socket();
+    connection[id].setEncoding('utf8');
+    connection[id].connect(port, host, function() {
+        console.log('CONNECTED TO: ' + host + ':' + port);
+        stateObserver.next({
+          "linkId": id,
+          "stream": data$
+        })
+    });
 
-client.on('data', function(data) {
-});
+    connection[id].on('data', function(data) {
+      dataObserver.next(data);
+    });
 
-client.on('close', function() {
-    console.log('Connection closed');
-});
+    connection[id].on('close', function() {
+        dataObserver.complete();
+        stateObserver.complete();
+        connection.splice(id, 1);
+    });
+  });
+
+  return state$;
+}
 ```
 
-Now we can create an observable when the client is connected. We first need to
-import the generated functions we will use:
+This function returns a stream that emits a stream when the connection is
+established. This latter stream then emits items each time some data is received
+on the socket. This function is used from a factory function that takes another
+stream as input:
 
 ```javascript
-import {
-  frame, unframe, Router, createCounterObservable
-} from './counter_rxt.js';
+function tcpClient(sink$) {
+  sink$.subscribe( (i) => {
+    connection[i.linkId].write(i.data);
+  });
+
+  return {
+    "connect" : createConnection
+  };
+}
 ```
 
-And implement our logic in the connect callback:
+Each item of the sink stream contains the data to write on the tcp socket.
+We will also use log function:
 
 ```javascript
-var router = null;
-var context = '';
-client.connect(PORT, HOST, function() {
-    console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-    router = new Router({"write": (d) => {
-      client.write(frame(d));
-    }});
-
-    console.log('creating observable');
-    createCounterObservable(router, 1, 10, 1)
-    .subscribe(
-      (i) => { console.log('tick: ' + i.value); },
-      (e) => { console.log('stream error'); },
-      () => {
-        console.log('completed');
-        process.exit();
-      }
-    );
-});
+function consoleDriver(sink$) {
+  sink$.subscribe( (i) => {
+    console.log('console: ' + i);
+  });
+}
 ```
 
-We fist create a router. The router takes a transport object as an argument.  In
-its write function we frame the data before sending it on the network link.
-
-Then we create an Observable. The returned observable is an RxJS Observable. So
-we can use it as any other stream. Here we directly subscribe to it and print
-each received item.
-
-The last thing to do is implementing the data reception callback:
+Now we can implement our logic:
 
 ```javascript
-client.on('data', function(data) {
-    const result = unframe(context, data.toString());
-    context = result.context;
-    result.packets.forEach( (e) => {
-      router.onMessage(e);
+import { router } from './counter_rxt.js';
+
+function main(sources) {
+  const linkRcv$ = sources.LINK.connect('counter', 'localhost', 9999);
+  const returnChannel$ = sources.ROUTER.linkData();
+  const console$ = sources.ROUTER.link()
+    .map( i => {
+      return sources.ROUTER.Counter(i.linkId, 1,10,1)
     })
-});
+    .mergeAll()
+    .map( i => i.value);;
+
+  return {
+   ROUTER: linkRcv$,
+   LINK: returnChannel$,
+   CONSOLE: console$
+  };
+}
 ```
 
-Each received data is unframed, and each unframed packet is notified to the
-router.
+The sources parameter contains objects returned by the tcp client factory, the
+console factory, and the router factory. This main function creates a Counter
+observable when the tcp connection is established, i.e. when an item is emitted
+on the sources.ROUTER.link() stream. The result of the counter is returned in
+the CONSOLE field, and will be connected to the console output.
+
+All streams are finally connected together:
+
+```javascript
+const consoleProxy$ = new Subject();
+const routerProxy$ = new Subject();
+const linkProxy$ = new Subject();
+
+const sources = {
+  CONSOLE: consoleDriver(consoleProxy$),
+  ROUTER: router(routerProxy$),
+  LINK: tcpClient(linkProxy$)
+};
+
+const sinks = main(sources);
+
+sinks.ROUTER.subscribe(routerProxy$);
+sinks.LINK.subscribe(linkProxy$);
+sinks.CONSOLE.subscribe(consoleProxy$);
+```
 
 Here is the complete code of the client. Save it to a file named
 "client.es6.js":
 
 ```javascript
+import {Observable, Subject} from 'rxjs';
 import {
-  frame, unframe, Router,
-  createCounterObservable
+  router,
 } from './counter_rxt.js';
+import {Socket} from 'net';
 
-var net = require('net');
+let connection = [];
 
-var HOST = '127.0.0.1';
-var PORT = 9999;
+function createConnection(id, host, port) {
+  const state$ = Observable.create(stateObserver => {
+    let dataObserver = null;
+    const data$ = Observable.create(observer => {
+      dataObserver = observer;
+    });
 
-var client = new net.Socket();
+    connection[id] = new Socket();
+    connection[id].setEncoding('utf8');
+    connection[id].connect(port, host, function() {
+        console.log('CONNECTED TO: ' + host + ':' + port);
+        stateObserver.next({
+          "linkId": id,
+          "stream": data$
+        })
+    });
 
-var router = null;
-var context = '';
-client.connect(PORT, HOST, function() {
-    console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-    router = new Router({"write": (d) => {
-      client.write(frame(d));
-    }});
+    connection[id].on('data', function(data) {
+      dataObserver.next(data);
+    });
 
-    console.log('creating observable');
-    createCounterObservable(router, 1, 10, 1)
-    .subscribe(
-      (i) => { console.log('tick: ' + i.value); },
-      (e) => { console.log('stream error'); },
-      () => {
-        console.log('completed');
-        process.exit();
-      }
-    );
-});
+    connection[id].on('close', function() {
+        dataObserver.complete();
+        stateObserver.complete();
+        connection.splice(id, 1);
+    });
+  });
 
-client.on('data', function(data) {
-    const result = unframe(context, data.toString());
-    context = result.context;
-    result.packets.forEach( (e) => {
-      router.onMessage(e);
+  return state$;
+}
+
+function tcpClient(sink$) {
+  sink$.subscribe( (i) => {
+    connection[i.linkId].write(i.data);
+  });
+
+  return {
+    "connect" : createConnection
+  };
+}
+
+function consoleDriver(sink$) {
+  sink$.subscribe( (i) => {
+    console.log('console: ' + i);
+  });
+}
+
+function main(sources) {
+  const linkRcv$ = sources.LINK.connect('counter', 'localhost', 9999);
+  const returnChannel$ = sources.ROUTER.linkData();
+  const console$ = sources.ROUTER.link()
+    .map( i => {
+      return sources.ROUTER.Counter(i.linkId, 1,10,1)
     })
-});
+    .mergeAll()
+    .map( i => i.value);;
 
-client.on('close', function() {
-    console.log('Connection closed');
-});
+  return {
+   ROUTER: linkRcv$,
+   LINK: returnChannel$,
+   CONSOLE: console$
+  };
+}
+
+const consoleProxy$ = new Subject();
+const routerProxy$ = new Subject();
+const linkProxy$ = new Subject();
+
+const sources = {
+  CONSOLE: consoleDriver(consoleProxy$),
+  ROUTER: router(routerProxy$),
+  LINK: tcpClient(linkProxy$)
+};
+
+const sinks = main(sources);
+
+sinks.ROUTER.subscribe(routerProxy$);
+sinks.LINK.subscribe(linkProxy$);
+sinks.CONSOLE.subscribe(consoleProxy$);
 ```
 
 ## Running it all
@@ -376,7 +472,7 @@ rxtender \
 --framing rxt_backend_base.python3.framing.newline \
 --serialization rxt_backend_base.python3.serialization.json \
 --stream rxt_backend_base.python3.stream \
---input counter.rxt > counter_rxt.py
+--input counter.rxt --output counter_rxt.py
 ```
 
 rxtender is invoked with 3 generation arguments (framing, serialization, and
@@ -396,7 +492,7 @@ Javascript NPM package.json:
   "license": "MIT",
   "main": "client.js",
   "scripts": {
-    "generate:counter": "rxtender --framing rxt_backend_base.es2015.framing.newline --serialization rxt_backend_base.es2015.serialization.json --stream rxt_backend_base.es2015.stream --stream rxt_backend_base.es2015_rxjs.stream --input counter.rxt > counter_rxt.es6.js",
+    "generate:counter": "rxtender --framing rxt_backend_base.es2015.framing.newline --serialization rxt_backend_base.es2015.serialization.json --stream rxt_backend_base.es2015_rxjs.stream --input counter.rxt --output counter_rxt.es6.js",
     "build:counter": "npm run generate:counter && babel --presets es2015 counter_rxt.es6.js --out-file counter_rxt.js",
     "build:client": "npm run build:counter && babel --presets es2015 client.es6.js --out-file client.js",
     "build": "npm run build:client",
@@ -412,11 +508,12 @@ Javascript NPM package.json:
 }
 ```
 
-You can see here that 2 stream arguments are provided to rxtender: es2015.stream
-and es2015_rxjs.stream. The first one generates generic es2015 stream bindings
-while the second one generates constructor functions for RxJS
-Observables (The createCounterObservable function that we used to create the
-stream). To generate the code, install npm dependencies and run rxtender:
+The stream argument provided to rxtender generates an es2015 rxjs router
+function. Since we use a TCP connection, and TCP is a stream protocol, we need
+some framing to encapsulate each item of the stream. Here we use new lines
+framing, as specified with the framing argument. With the serialization argument
+we asked rxtender to generate json serialization of all structs defined in the
+IDL. To generate the code, install npm dependencies and run rxtender:
 
 ```shell
 npm install
